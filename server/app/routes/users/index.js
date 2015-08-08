@@ -13,7 +13,13 @@ router.get('/', function(req, res, next) {
 });
 
 router.post('/', function(req, res, next) {
-    // whatever
+    var u = new User(req.body);
+    u.save()
+        .then(function(user) {
+            res.status(200).send({
+                user: _.omit(user.toJSON(), ['password', 'salt'])
+            });
+        });
 });
 
 router.param('id', function(req, res, next, id) {

@@ -86,6 +86,14 @@
 
         };
 
+        this.signup = (credentials) => {
+            return $http.post('/api/users', credentials)
+                .then(onSuccessfulLogin)
+                .catch(function() {
+                    return $q.reject({message: 'There was a problem signing up'});
+                });
+        };
+
         this.login = function (credentials) {
             return $http.post('/login', credentials)
                 .then(onSuccessfulLogin)

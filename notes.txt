@@ -119,6 +119,13 @@ have webpage update with the data
 
 
 
+// the blockchain
+
+what should each block have?
+	its own hash
+	the previous hash
+	all the tx hashes (an array of tx)
+
 
 
 

@@ -22,6 +22,9 @@ var Promise = require('bluebird');
 var chalk = require('chalk');
 var connectToDb = require('./server/db');
 var User = Promise.promisifyAll(mongoose.model('User'));
+var Tx = Promise.promisifyAll(mongoose.model('Tx'));
+var Block = Promise.promisifyAll(mongoose.model('Block'));
+var Chain = Promise.promisifyAll(mongoose.model('Chain'));
 
 var seedUsers = function () {
 
@@ -44,6 +47,54 @@ var seedUsers = function () {
 
 };
 
+var seedTx = function () {
+
+    var txs = [
+        {
+            hash: 'testing@fsa.com'
+        },
+        {
+            hash: 'obama@gmail.com'
+        },
+        {
+            hash: 'jack@mulrow.com'
+        },
+        {
+            hash: '3jack@mulrow.comadfdas'
+        },
+        {
+            hash: 'fafadsfewdsaas3242'
+        },
+        {
+            hash: 'adsfadsf345345fg'
+        }
+    ];
+
+    return Tx.createAsync(txs);
+
+};
+
+var seedBlocks = function () {
+
+    var blocks = [
+        {
+            email: 'testing@fsa.com',
+            password: 'password'
+        },
+        {
+            email: 'obama@gmail.com',
+            password: 'potus'
+        },
+        {
+            email: 'jack@mulrow.com',
+            password: 'jack'
+        }
+    ];
+
+    return Block.createAsync(blocks);
+
+};
+
 connectToDb.then(function () {
     User.findAsync({}).then(function (users) {
         if (users.length === 0) {
@@ -52,6 +103,8 @@ connectToDb.then(function () {
             console.log(chalk.magenta('Seems to already be user data, exiting!'));
             process.kill(0);
         }
+    }).then(function() {
+        return seedTx();
     }).then(function () {
         console.log(chalk.green('Seed successful!'));
         process.kill(0);
