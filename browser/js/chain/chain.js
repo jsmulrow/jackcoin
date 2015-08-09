@@ -6,13 +6,18 @@ app.config(function ($stateProvider) {
         resolve: {
         	user: function(AuthService) {
         		return AuthService.getLoggedInUser();
-        	}
+        	},
+            chain: function($http) {
+                return $http.get('/api/chain')
+                    .then(res => res.data);
+            }
         }
     });
 });
 
-app.controller('ChainCtrl', function($scope, user, BitcoinFactory) {
+app.controller('ChainCtrl', function($scope, user, chain, BitcoinFactory) {
 	if (user) $scope.user = user;
+    if (chain) $scope.chain = chain;
 
 	console.log('welcome to the JackChain, ', user.email);
 

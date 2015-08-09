@@ -63,7 +63,6 @@ router.get('/coins/:address', function(req, res, next) {
         // also only return unspent outputs
         var output = _.chain(helperTxs).pluck('output').flatten().value();
         output = output.filter(function(out) {
-            console.log('filtering these output', out);
             return out.address === req.params.address && !out.spent;
         });
 

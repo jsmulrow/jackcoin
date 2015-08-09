@@ -33,7 +33,7 @@ app.controller('HomeCtrl', function($scope, user, users, txs, BitcoinFactory, Tx
 
     var sCoin = Bitcoin.ECKey.fromWIF($scope.sender.privateKey);
 
-    var pastTxDummy = 'f584d1eb4d7e48b6d870d61c36e6ba9bd6f2a55faf21e0497a19fa7612e8a1ae';
+    var pastTxDummy = 'b0cc3560ca1dc4aa03cb5dca6df52b532ce2485a1d284838a5b8d80e1878f015';
 
     TxFactory.transaction(pastTxDummy, 0, 15, $scope.recipient);
 

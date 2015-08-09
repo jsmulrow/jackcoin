@@ -22,6 +22,15 @@ router.post('/', function(req, res, next) {
         });
 });
 
+router.get('/hash/:hash', function(req, res, next) {
+    console.log('looking for this hash', req.params.hash);
+    Block.findOne({hash: req.params.hash}).exec()
+        .then(function(tx) {
+            res.json(tx);
+        })
+        .then(null, next);
+});
+
 router.param('id', function(req, res, next, id) {
     Block.findById(id).exec()
         .then(function(block) {

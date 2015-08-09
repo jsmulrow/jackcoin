@@ -2,14 +2,24 @@
 var socketio = require('socket.io');
 var mongoose = require('mongoose');
 var io = null;
+
+
 var sha256 = require('crypto-hashing').sha256;
-var blockChain = [{'test': 'fake block data'}];
-var lastBlockHash = 'fakelasthash';
+var blockChain = [];
+var lastBlockHash = '';
 var txCache = [];
 var difficulty = 3;
+
 var Tx = mongoose.model('Tx');
 var Block = mongoose.model('Block');
 var Chain = mongoose.model('Chain');
+
+// get chain info
+Chain.findOne().exec().then(function(cha) {
+    lastBlockHash = cha.blocks[cha.blocks.length-1];
+    blockChain = cha;
+});
+
 
 module.exports = function (server) {
 
@@ -37,58 +47,45 @@ module.exports = function (server) {
         	console.log('this socket, ', socket.id, ', thinks it completed a block with this hash: ', block.hash);
             console.log('possibly completed block', block);
 
+
         	// validate the new block
-
-            console.log('valid? ', validateBlock(block));
-
             // ignore the block if it isn't valid
             if (!validateBlock(block)) return;
             console.log('validated the block!');
+            // let miner know it was validated
+            socket.emit('validatedBlock');
 
 
-        	// attach it to the block chain
-            /// use a method on the schema?
-            /// yeah and just push it to the chain in mongo
-            /// probably $push
-
-
-            // save each tx to the db
-            var mongoTxs = [];
+            // save each tx to the db - and only keep hash in the block tx array
             block.txs = block.txs.map(function(tx) {
                 var t = new Tx(tx);
-                t.spent = true;
-                mongoTxs.push(t);
                 t.save();
-                return t;
+                return t.hash;
             });
 
-            console.log('mongo txs', mongoTxs);
 
             // save the completed blocks to the db
             var b = new Block(block);
             b.save();
             console.log('mongo block', b);
 
+
             // add the block to the chain
-            Chain.findOne().exec()
-            .then(function(chain) {
-                console.log('the chain', chain);
-                if (!chain) return;
-                chain.push(b);
-                chain.save();
-                console.log('the new chain', chain);
+            console.log('old block chain', blockChain);
+            blockChain.blocks.push(b.hash);
+            blockChain.save().then(function(cha) {
+                console.log('updated block chain', cha);
+                blockChain = cha;
             })
             .then(null, function(e) {
-                console.log('failed ---- ', e);
+                console.warn('got error', e);
             });
-
-            console.log('the cache', txCache);
+            // update cached chain
+            lastBlockHash = block.hash;
 
 
             // remove the block's txs from the cache
-            var completedTxs = block.txs.map(function(tx) {
-                return tx.hash;
-            });
+            var completedTxs = block.txs;
             txCache = txCache.filter(function(tx) {
                 return completedTxs.indexOf(tx.hash) === -1; 
             });
@@ -98,7 +95,7 @@ module.exports = function (server) {
 
         	// send it out to other miners
             //// just the header? or entire block?
-        	io.sockets.emit('newBlock', block);
+        	io.sockets.emit('newBlock', block.hash);
         });
 
         // transactions

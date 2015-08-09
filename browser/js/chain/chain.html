@@ -1,4 +1,19 @@
 <h1>The JackChain</h1>
-<h2>Public record of all jackCoin transactions</h2>
+<h2>Public record of all JackCoin transactions</h2>
 
-<pre>{{user|json}}</pre>
+<pre>{{chain|json}}</pre>
+
+<div class="row">
+	<div class="col-sm-6">
+		<h2>The JackChain</h2>
+		<ul>
+			<li ng-repeat="block in chain.blocks"
+				ui-sref="chain.block({hash: block})">
+				Block {{$index}}: <a href="">{{block}}</a>
+			</li>
+		</ul>
+	</div>
+	<div class="col-sm-6">
+		<ui-view></ui-view>
+	</div>
+</div>

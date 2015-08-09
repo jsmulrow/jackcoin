@@ -10,8 +10,6 @@ var schema = new mongoose.Schema({
     	type: String
     },
     txs: [String],
-    	// type: mongoose.Schema.Types.ObjectId,
-    	// ref: 'Tx'
         // hash of a tx
     timestamp: {
         type: Date

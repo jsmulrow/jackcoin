@@ -49,6 +49,16 @@ gulp.task('buildJS', ['lintJS'], function () {
         .pipe(gulp.dest('./public'));
 });
 
+gulp.task('buildMineJS', function () {
+    return gulp.src(['./browser/mine.js'])
+        .pipe(plumber())
+        .pipe(sourcemaps.init())
+        .pipe(concat('mine.js'))
+        .pipe(babel())
+        .pipe(sourcemaps.write())
+        .pipe(gulp.dest('./public'));
+});
+
 gulp.task('testServerJS', function () {
 	return gulp.src('./tests/server/**/*.js', {
 		read: false
@@ -131,7 +141,15 @@ gulp.task('buildJSProduction', function () {
         .pipe(gulp.dest('./public'));
 });
 
-gulp.task('buildProduction', ['buildCSSProduction', 'buildJSProduction']);
+gulp.task('buildMineJSProduction', function () {
+    return gulp.src(['./browser/mine.js'])
+        .pipe(concat('mine.js'))
+        .pipe(babel())
+        .pipe(uglify())
+        .pipe(gulp.dest('./public'));
+});
+
+gulp.task('buildProduction', ['buildCSSProduction', 'buildJSProduction', 'buildMineJSProduction']);
 
 // --------------------------------------------------------------
 
@@ -142,7 +160,7 @@ gulp.task('build', function () {
     if (process.env.NODE_ENV === 'production') {
         runSeq(['buildJSProduction', 'buildCSSProduction']);
     } else {
-        runSeq(['buildJS', 'buildCSS']);
+        runSeq(['buildJS', 'buildMineJS', 'buildCSS']);
     }
 });
 
@@ -153,6 +171,10 @@ gulp.task('default', function () {
 
     gulp.watch('browser/js/**', function () {
         runSeq('buildJS', 'reload');
+    });
+
+    gulp.watch('browser/mine.js', function() {
+        runSeq('buildMineJS', 'reload');
     });
 
     gulp.watch('browser/scss/**', function () {
