@@ -1,7 +1,10 @@
-// console.log('inside mine js');
-// // console.log('bitcoin is ', Bitcoin);
+// console.log('created mining infrastructure');
 
-// (function() {
+// // should the mining function take the public address of the miner? (logged in user)
+// //   or maybe their private key?
+// function beginMining() {
+
+// 	console.log('inside mine js');
 
 // 	var blockchain = {};
 // 	var txCache = [];
@@ -9,12 +12,6 @@
 // 	// maybe I only need to store the latest block's hash?
 // 	var prevHash = '';
 
-// 	var socket = io(window.location.origin);
-// 	console.log('connected socketio');
-
-// 	socket.on('connect', function() {
-// 		console.log('browser connected to server (i.e. node)');
-// 	});
 
 // 	socket.on('initializeMiner', function(prev) {
 // 		console.log('received last block from node');
@@ -28,6 +25,7 @@
 
 // 	socket.on('newTx', function(tx) {
 // 		console.log('got this new tx: - ', tx);
+// 		console.log('random number: ', Math.ceil(Math.random() * 5));
 
 // 		// validate the tx
 // 		//// should be given the input, output, and amount - do the hash and see if it passes
@@ -45,7 +43,7 @@
 
 // 	});
 
-// 	var sha256 = require('crypto-hashing').sha256;
+// 	var sha256 = cryptoHashing.sha256;
 
 // 	console.log('hashed', sha256('jack'));
 
@@ -93,10 +91,10 @@
 // 		return hash;
 // 	}
 
-// 	console.log('starting hashing', difficulty);
-// 	var h = tryHash('jasdfad8sfas;fa42fdfa', 0);
-// 	console.log('counter', counter);
-// 	console.log('ending hashing', h);
+// 	// console.log('starting hashing', difficulty);
+// 	// var h = tryHash('jasdfad8sfas;fa42fdfa', 0);
+// 	// console.log('counter', counter);
+// 	// console.log('ending hashing', h);
 
 
 
@@ -118,12 +116,7 @@
 
 // 		// server needs blockHeader, selected txs, prev header, and a timestamp (not for validation though)
 
-
-
 // 	}
 
 
-
-
-
-// })();
+// }

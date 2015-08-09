@@ -10,7 +10,8 @@ app.directive('navbar', function ($rootScope, AuthService, AUTH_EVENTS, $state) 
                 { label: 'Home', state: 'home' },
                 { label: 'JackChain', state: 'chain' },
                 { label: 'Documentation', state: 'docs' },
-                { label: 'Your Wallet', state: 'wallet', auth: true }
+                { label: 'Your Wallet', state: 'wallet', auth: true },
+                { label: 'Start Mining', state: 'mining', auth: true }
             ];
 
             scope.user = null;

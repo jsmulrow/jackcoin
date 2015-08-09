@@ -9,9 +9,15 @@ var schema = new mongoose.Schema({
     prevHash: {
     	type: String
     },
-    txs: {
-    	type: mongoose.Schema.Types.ObjectId,
-    	ref: 'Tx'
+    txs: [String],
+    	// type: mongoose.Schema.Types.ObjectId,
+    	// ref: 'Tx'
+        // hash of a tx
+    timestamp: {
+        type: Date
+    },
+    nonce: {
+        type: Number
     }
 });
 

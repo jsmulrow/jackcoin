@@ -10,18 +10,33 @@ app.config(function ($stateProvider) {
             txs: function($http) {
                 return $http.get('/api/tx')
                     .then(res => res.data);
+            },
+            users: function($http) {
+                return $http.get('/api/users')
+                    .then(res => res.data);
             }
         }
     });
 });
 
-app.controller('HomeCtrl', function($scope, user, txs, BitcoinFactory) {
+app.controller('HomeCtrl', function($scope, user, users, txs, BitcoinFactory, TxFactory) {
 	if (user) $scope.user = user;
 	console.log('logged in', user);
-    console.log('txs', txs);
+    if (users) $scope.users = users;
+    console.log('all users', users);
     if (txs) $scope.txs = txs;
+    console.log('txs', txs);
 
-    console.log('dafasdf-a0=-=-=-=--==-');
+    $scope.sender = user;
+    // recipient is their public address
+    $scope.recipient = users[0];
+
+    var sCoin = Bitcoin.ECKey.fromWIF($scope.sender.privateKey);
+
+    var pastTxDummy = 'f584d1eb4d7e48b6d870d61c36e6ba9bd6f2a55faf21e0497a19fa7612e8a1ae';
+
+    TxFactory.transaction(pastTxDummy, 0, 15, $scope.recipient);
+
 
     // console.log('bitcoin is ', Bitcoin);
     // console.log('private key', user.privateKey);

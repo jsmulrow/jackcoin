@@ -1,4 +1,52 @@
 <h1>Your Wallet</h1>
 <h2>Dashboard for stats on your jackcoins</h2>
-
+<h2>Logged in user: </h2>
 <pre>{{user|json}}</pre>
+<div class="row">
+	<div ng-show="showTransaction" class="col-sm-12">
+		<h2>Current transaction: </h2>
+		<div class="row">
+			<div class="col-sm-4">
+				<h3>Sending this amount: </h3>
+				<input ng-model="amount" class="">
+			</div>
+			<div class="col-sm-4">
+				<h3>From this coin: </h3>
+				<ul ng-show="selectedCoin">
+					<li>Value: {{selectedCoin.amount}}</li>
+					<li>Tx: {{selectedCoin.txHash}}</li>
+				</ul>
+			</div>
+			<div class="col-sm-4">
+				<h3>To this address: </h3>
+				<ul ng-show="selectedRecipient">
+					<li>{{selectedRecipient}}</li>
+				</ul>
+			</div>
+		</div>
+		<a id="tx-submit-btn" class="btn btn-success"
+			ng-click="startTransaction(selectedCoin, selectedRecipient, amount)"
+			style="margin: 10px">
+			Submit Transaction
+		</a>
+	</div>
+	<div class="col-sm-6">
+		<h2>Public addresses: </h2>
+		<ul>
+			<li ng-repeat="recipient in recipients"
+				ng-click="selectRecipient(recipient)">
+				<a href="">{{recipient}}</a>
+			</li>
+		</ul>
+	</div>
+	<div class="col-sm-6">
+		<h2>Your "coins"</h2>
+		<ul>
+			<!-- a "coin" is a past tx output -->
+			<li ng-repeat="coin in coins"
+				ng-click="selectCoin(coin)">
+				<a href="">Value: {{coin.amount}}</a>
+			</li>
+		</ul>
+	</div>
+</div>

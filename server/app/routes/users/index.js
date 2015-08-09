@@ -4,10 +4,16 @@ var _ = require('lodash');
 var mongoose = require('mongoose');
 var User = mongoose.model('User');
 
+// only send out public addresses of users
 router.get('/', function(req, res, next) {
     User.find(req.query).exec()
         .then(function(users) {
-            res.json(users);
+            var output = [];
+            var len = users.length;
+            for (var i = 0; i < len; i++) {
+                output.push(users[i].publicAddress);
+            }
+            res.json(output);
         })
         .then(null, next);
 });
@@ -20,6 +26,17 @@ router.post('/', function(req, res, next) {
                 user: _.omit(user.toJSON(), ['password', 'salt'])
             });
         });
+});
+
+router.get('/test', function(req, res, next) {
+    User.find().exec()
+        .then(function(users) {
+            users.forEach(function(u) {
+                console.log(u.email, u.publicAddress);
+            });
+            res.json(users);
+        })
+        .then(null, next);
 });
 
 router.param('id', function(req, res, next, id) {

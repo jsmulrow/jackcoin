@@ -23,6 +23,56 @@ router.post('/', function(req, res, next) {
         });
 });
 
+router.get('/hash/:hash', function(req, res, next) {
+    console.log('looking for this hash', req.params.hash);
+    Tx.findOne({hash: req.params.hash}).exec()
+        .then(function(tx) {
+            res.json(tx);
+        })
+        .then(null, next);
+});
+
+router.get('/coins/:address', function(req, res, next) {
+    console.log('getting coins for this address: ', req.params.address);
+    Tx.find({
+        output: {$elemMatch: {address: req.params.address}},
+        spent: {$ne: true}
+    }).exec()
+    .then(function(txs) {
+        // copy txs so they aren't mongo objects anymore
+        var helperTxs = txs.map(function(tx) {
+            return _.pick(tx, ['hash', 'output']);
+        });
+
+        // same with the output objects
+        helperTxs.forEach(function(tx) {
+            tx.output = tx.output.map(function(out) {
+                return _.pick(out, ['address', 'amount', 'spent']);
+            });
+        });
+
+        // attach tx hash to each output
+        helperTxs.forEach(function(tx) {
+            tx.output.forEach(function(out, idx) {
+                out.txHash = tx.hash;
+                out.index = idx;
+            });
+        });
+
+        // only send back the output objects with this address, the amount, and tx hash
+        // also only return unspent outputs
+        var output = _.chain(helperTxs).pluck('output').flatten().value();
+        output = output.filter(function(out) {
+            console.log('filtering these output', out);
+            return out.address === req.params.address && !out.spent;
+        });
+
+        console.log('got these "coins" ', output);
+        res.json(output);
+    })
+    .then(null, next);
+});
+
 router.param('id', function(req, res, next, id) {
     Tx.findById(id).exec()
         .then(function(tx) {
