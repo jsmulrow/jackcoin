@@ -48,6 +48,18 @@ var seedUsers = function () {
             // public addr: 1FWCfH41zEQMCUTmrFArtHTfeBbS16aAwQ
             email: 'jack@mulrow.com',
             password: 'jack'
+        },
+        {
+            // private key: L3oQyPVUxZJQuXnzcMtTjLfWqEGFP7r3VHR2wn4Qf8EFreWfPKzk
+            // public addr: 16fFn4hdYx1Kvbqb414P2ZYHr4Tw9npLPb
+            email: 'satoshi.nakamoto@bitcoin.org',
+            password: 'satoshi'
+        },
+        {
+            // private key: L1Ntz9fEY7Y1f1t2puTviN6UoT7Zfqvbei7SAfBKK4V7D2QYKZ71
+            // public addr: 14V9Yed1Br9T5pbwGiGSryEHcvJrNCr8eJ
+            email: 'jack.mulrow@gmail.com',
+            password: 'jack'
         }
     ];
 

@@ -1,9 +1,16 @@
 <div class="row">
 	<h2>Block View</h2>
-	<div class="col-sm-8">
+	<div class="col-sm-6">
+		<h3>The block</h3>
+		<ul>
+			<li ng-repeat="tx in block.txs"
+				ui-sref="chain.block.tx({txHash: tx})">
+				Tx: <a href="">{{tx}}</a>
+			</li>
+		</ul>
 		<pre>{{block|json}}</pre>
 	</div>
-	<div class="col-sm-4">
-		<h3>Other stuff about the block</h3>
+	<div class="col-sm-6">
+		<ui-view></ui-view>
 	</div>
 </div>

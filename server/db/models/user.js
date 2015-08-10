@@ -1,6 +1,7 @@
 'use strict';
 var crypto = require('crypto');
 var mongoose = require('mongoose');
+var bitcoin = require('bitcoinjs-lib');
 
 var schema = new mongoose.Schema({
     email: {
@@ -41,6 +42,7 @@ schema.pre('save', function (next) {
     // initialize private key
     if (!this.privateKey) {
         this.privateKey = genPrivateKey();
+        // this.publicAddress = genPublicAddress(this.privateKey);
     }
 
     next();
@@ -54,11 +56,14 @@ schema.method('correctPassword', function (candidatePassword) {
     return encryptPassword(candidatePassword, this.salt) === this.password;
 });
 
-var bitcoin = require('bitcoinjs-lib');
-
 // creates random private key in WIF format
 function genPrivateKey() {
     return bitcoin.ECKey.makeRandom().toWIF();
+}
+
+// creates public address from private key
+function genPublicAddress(priv) {
+    return bitcoin.ECKey.fromWIF(priv).pub.getAddress().toString();
 }
 
 // returns public key from private key

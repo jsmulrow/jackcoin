@@ -1,5 +1,22 @@
 <h1>Click below to start mining</h1>
-<a class="btn btn-warning" ng-click="startMining()" ng-hide="mining">Mine JackCoins</a>
-<a class="btn btn-info" ng-click="stopMining()" ng-show="mining">Stop Mining</a>
-<a class="btn btn-danger" ng-click="initializeMining()" ng-hide="initialized">Initialize Miner</a>
+<div class="row">
+	<div class="col-sm-6">
+		<a class="btn btn-warning" ng-click="startMining()" ng-hide="mining">Mine JackCoins</a>
+		<a class="btn btn-info" ng-click="stopMining()" ng-show="mining">Stop Mining</a>
+		<a class="btn btn-danger" ng-click="initializeMining()" ng-hide="initialized">Initialize Miner</a>
+	</div>
+	<div class="col-sm-6">
+		<form ng-submit="changeDifficulty(diff)">
+			<a class="btn btn-primary" type="submit">Change Difficulty (for testing)</a>
+			<input ng-model="diff" type="number">
+		</form>
+	</div>
+</div>
 
+<div>
+	<h2>Status: {{message}}</h2>
+</div>
+
+<div ng-show="resultMessage">
+	<h2>Result: {{resultMessage}}</h2>
+</div>

@@ -19,34 +19,19 @@ app.config(function ($stateProvider) {
     });
 });
 
-app.controller('HomeCtrl', function($scope, user, users, txs, BitcoinFactory, TxFactory) {
-	if (user) $scope.user = user;
+app.controller('HomeCtrl', function($scope, user, users, txs, TxFactory) {
+	if (user) {
+        user.publicAddress = genPublicAddress(user.privateKey);
+        $scope.user = user;
+    }
 	console.log('logged in', user);
     if (users) $scope.users = users;
     console.log('all users', users);
     if (txs) $scope.txs = txs;
     console.log('txs', txs);
 
-    $scope.sender = user;
-    // recipient is their public address
-    $scope.recipient = users[0];
-
-    var sCoin = Bitcoin.ECKey.fromWIF($scope.sender.privateKey);
-
-    var pastTxDummy = 'b0cc3560ca1dc4aa03cb5dca6df52b532ce2485a1d284838a5b8d80e1878f015';
-
-    TxFactory.transaction(pastTxDummy, 0, 15, $scope.recipient);
-
-
-    // console.log('bitcoin is ', Bitcoin);
-    // console.log('private key', user.privateKey);
-
-    // var coin = BitcoinFactory.getCoinFromWIF(user.privateKey);
-
-    // console.log('new coin', coin);
-    // console.log('public key', coin.pub);
-    // console.log('public addr', coin.pub.getAddress().toString());
-
-
-
+    // creates public address from private key
+    function genPublicAddress(priv) {
+        return Bitcoin.ECKey.fromWIF(priv).pub.getAddress().toString();
+    }
 });

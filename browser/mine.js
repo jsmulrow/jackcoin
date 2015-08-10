@@ -16,7 +16,7 @@ var cb=state.writecb;onwriteStateUpdate(state);if(er)onwriteError(stream,state,s
 self.addEventListener('message', function(e) {
 	var header = e.data[0];
 	var difficulty = e.data[1];
-	console.log('from the worker', {header: header, difficulty: difficulty});
+	console.log('inside the worker', {header: header, difficulty: difficulty});
 	var nonce = mine(header, difficulty);
 	self.postMessage({
 		nonce: nonce
@@ -31,12 +31,12 @@ function mine(header, difficulty) {
 }
 
 function tryHash(header, difficulty) {
-	console.log('fake hash', sha256('jack'));
-	console.log('header', header, 'difficulty', difficulty);
 	var counter = 0;
 	var nonce = 0;
 	var hash = '';
+	var checkpoint = 100 * difficulty * difficulty * difficulty;
 	while (!validHash(hash, difficulty)) {
+		if (counter % checkpoint === 0) console.log('counter: ', counter);
 		hash = sha256(header + nonce).toString('hex');
 		counter += 1;
 		nonce += 1;
@@ -44,7 +44,7 @@ function tryHash(header, difficulty) {
 	// prevent one off error with the nonce
 	nonce -= 1;
 
-	console.log('counter: ', counter);
+	console.log('final counter: ', counter);
 	return nonce;
 }
 

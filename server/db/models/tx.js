@@ -4,8 +4,12 @@ var mongoose = require('mongoose');
 
 var schema = new mongoose.Schema({
 	// each tx has a hash
+    coinbase: {
+        type: Boolean,
+        default: false
+    },
     hash: {
-        type: Object
+        type: String
     },
     // input 
     input: {
@@ -27,7 +31,8 @@ var schema = new mongoose.Schema({
                 default: false
             }
         }]
-    }
+    },
+    timestamp: Date
 });
 
 mongoose.model('Tx', schema);

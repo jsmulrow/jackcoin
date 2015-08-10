@@ -18,12 +18,12 @@ app.config(function ($stateProvider) {
 });
 
 app.controller('WalletCtrl', function($scope, user, recipients, coins, WalletFactory, TxFactory) {
-	if (user) $scope.user = user;
-	console.log('logged in', user);
+	if (user) {
+        user.publicAddress = genPublicAddress(user.privateKey);
+        $scope.user = user;
+    }
     if (recipients) $scope.recipients = recipients;
-    console.log('public addresses', recipients);
     if (coins) $scope.coins = coins;
-    console.log('these coins', coins);
 
     // initialize values
     $scope.showTransaction = false;
@@ -55,6 +55,11 @@ app.controller('WalletCtrl', function($scope, user, recipients, coins, WalletFac
         TxFactory.transaction(coin.txHash, coin.index, amount, recipient);
         // put correct inof in the transaciton call
     };
+
+    // creates public address from private key
+    function genPublicAddress(priv) {
+        return Bitcoin.ECKey.fromWIF(priv).pub.getAddress().toString();
+    }
 
 });
 

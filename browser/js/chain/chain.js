@@ -15,7 +15,7 @@ app.config(function ($stateProvider) {
     });
 });
 
-app.controller('ChainCtrl', function($scope, user, chain, BitcoinFactory) {
+app.controller('ChainCtrl', function($scope, user, chain) {
 	if (user) $scope.user = user;
     if (chain) $scope.chain = chain;
 

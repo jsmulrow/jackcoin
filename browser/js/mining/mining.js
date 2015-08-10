@@ -12,22 +12,30 @@ app.config(function ($stateProvider) {
 });
 
 app.controller('MiningCtrl', function($scope, user, MiningFactory) {
-	if (user) $scope.user = user;
+	if (user) {
+        user.publicAddress = genPublicAddress(user.privateKey);
+        $scope.user = user;
+    }
 	console.log('logged in', user);
     $scope.mining = false;
-    $scope.initialized = false;
+    $scope.initialized = MiningFactory.initialized;
+    $scope.message = $scope.initialized ? 'Miner initialized - ready to start' : 'Initialize your miner';
+    $scope.diff = MiningFactory.getDifficulty();
+    $scope.resultMessage = '';
 
     console.log('ran the mining ctrl');
 
     $scope.initializeMining = function() {
         MiningFactory.initializeMining();
         $scope.initialized = true;
+        $scope.message = 'Miner initialized - ready to start';
     };
 
     $scope.startMining = function() {
-        MiningFactory.startMining();
         if ($scope.initialized) {
+            $scope.message = 'Currently mining';
             $scope.mining = true;
+            MiningFactory.startMining(user.publicAddress);
         }
     };
 
@@ -35,5 +43,35 @@ app.controller('MiningCtrl', function($scope, user, MiningFactory) {
         $scope.mining = false;
         MiningFactory.stopMining();
     };
+
+    $scope.changeDifficulty = function(diff) {
+        console.log('changing diff to: ', diff);
+        MiningFactory.changeDifficulty(diff);
+    };
+
+    socket.on('finishedMining', function() {
+        console.log('miner is finished');
+        $scope.$apply(function() {
+            $scope.mining = false;
+            $scope.message = 'Mining completed';
+        });
+    });
+
+    socket.on('validatedBlock', function(blockHash) {
+        $scope.$apply(function() {
+            $scope.resultMessage = 'Completed a validated block - ' + blockHash;
+        });
+    });
+
+    socket.on('rejectedBlock', function(reason) {
+        $scope.$apply(function() {
+            $scope.resultMessage = 'Submitted block was rejected - ' + reason;
+        });
+    });
+
+    // creates public address from private key
+    function genPublicAddress(priv) {
+        return Bitcoin.ECKey.fromWIF(priv).pub.getAddress().toString();
+    }
 
 });

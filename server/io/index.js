@@ -9,6 +9,8 @@ var blockChain = [];
 var lastBlockHash = '';
 var txCache = [];
 var difficulty = 3;
+var reward = 50;
+var completedTx = [];
 
 var Tx = mongoose.model('Tx');
 var Block = mongoose.model('Block');
@@ -38,8 +40,13 @@ module.exports = function (server) {
             socket.emit('initializeMiner', {
                 prevHash: lastBlockHash,
                 difficulty: difficulty,
-                txCache: txCache
+                txCache: txCache,
+                reward: reward
             });
+        });
+
+        socket.on('changeDifficulty', function(diff) {
+            difficulty = diff;
         });
 
         // should be sent with "completed" block
@@ -49,11 +56,76 @@ module.exports = function (server) {
 
 
         	// validate the new block
+            // blocks need to have at least one tx
+            if (!block.txs.length) {
+                socket.emit('rejectedBlock', 'No tx');
+                return;
+            }
+            // must be latest in the chain
+            if (block.prevHash !== lastBlockHash) {
+                socket.emit('rejectedBlock', 'Outdated chain');
+                return;
+            }
+            // must have tx that aren't only coinbase
+            if (!block.txs.filter(function(tx) {return !tx.coinbase; }).length) {
+                socket.emit('rejectedBlock', 'No tx');
+                return;
+            }
+
+            // check for double spending
+            // var start = Date.now();
+            // while (Date.now() - start < 3000) {
+            //     inputs.forEach(function(input) {
+            //         Tx.findOne({
+            //             input: {$elemMatch: {address: input.address}}
+            //         }).exec().then(function(tx) {
+            //             if (tx) return;
+            //             console.log('in the validating for each', input.tx);
+            //             var t = new Tx(input.tx);
+            //             t.save();
+            //         });
+            //     });
+            // }
+            ////// either use promise.all
+            ////// or look through a cached version of all the tx synchronously
+
             // ignore the block if it isn't valid
             if (!validateBlock(block)) return;
             console.log('validated the block!');
             // let miner know it was validated
-            socket.emit('validatedBlock');
+            socket.emit('validatedBlock', block.hash);
+
+            // set all input "coins" as spent
+            var inputs = [];
+            block.txs.forEach(function(tx) {
+                console.log('inside for each,', tx);
+                if (!tx.coinbase) {
+                    inputs.push({
+                        address: tx.input[0].address,
+                        amount: tx.input[0].amount,
+                        tx: tx.hash
+                    });
+                }
+            });
+            // look up that transaction and remove the output to this address with this amount
+            inputs.forEach(function(input) {
+                Tx.findOne({
+                    output: {$elemMatch: {$and: [{address: input.address}, {amount: input.amount}, {spent: false}]}}
+                }).exec()
+                    .then(function(tx) {
+                        console.log('found this tx', tx);
+                        // find the correct output
+                        tx.output.forEach(function(out) {
+                            if (out.address === input.address && out.amount === input.amount) {
+                                // set it to spent
+                                out.spent = true;
+                                console.log('setting this out to spent', out);
+                            }
+                        });
+                        tx.save();
+                    });
+            });
+
 
 
             // save each tx to the db - and only keep hash in the block tx array
@@ -106,7 +178,14 @@ module.exports = function (server) {
             txCache.push(tx);
 
             // send tx to miners - don't save to db
+            // miners validate the tx
             io.sockets.emit('newTx', tx);
+        });
+
+        // for mining button
+        socket.on('finishedMining', function() {
+            // tell browser mining is over
+            socket.emit('finishedMining');
         });
 
     });

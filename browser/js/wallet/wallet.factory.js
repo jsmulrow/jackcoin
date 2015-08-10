@@ -10,9 +10,7 @@ app.factory('WalletFactory', function($http) {
 	};
 
 	fact.getCoins = (priv) => {
-		console.log('this is the private key', priv);
 		var pubAddr = bitcoin.ECKey.fromWIF(priv).pub.getAddress().toString();
-		console.log('this is the public address', pubAddr);
 		return $http.get('/api/tx/coins/' + pubAddr)
 			.then(res => res.data);
 	};

@@ -4,9 +4,6 @@ app.config(function ($stateProvider) {
         templateUrl: 'js/chain/block/block.html',
         controller: 'BlockCtrl',
         resolve: {
-        	user: function(AuthService) {
-        		return AuthService.getLoggedInUser();
-        	},
             block: function($http, $stateParams) {
                 return $http.get('/api/blocks/hash/' + $stateParams.hash)
                     .then(res => res.data);
@@ -15,10 +12,7 @@ app.config(function ($stateProvider) {
     });
 });
 
-app.controller('BlockCtrl', function($scope, user, block, BitcoinFactory) {
-	if (user) $scope.user = user;
+app.controller('BlockCtrl', function($scope, block) {
     if (block) $scope.block = block;
-
-	console.log('welcome to the JackChain, ', user.email);
 
 });

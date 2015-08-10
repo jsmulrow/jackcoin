@@ -1,30 +1,30 @@
-app.factory('TxFactory', function($http, $q) {
+app.factory('TxFactory', function($http, AuthService) {
 	var fact = {};
 
-	// dependencies - should be browserified
-    var sha256 = cryptoHashing.sha256;
-    // lodash too
+	console.log('ran tx factory');
 
-    ///// -=-= private functions =-=-
+    var sha256 = cryptoHashing.sha256;
+
+    // get user - for convenience
+	var user;
+	AuthService.getLoggedInUser()
+	.then(function(us) {
+		user = us;
+		console.log('tx factory has this user', user);
+	});
 
 	// input and output are arrays
-    function txHash(input, output, pastTxHash) {
-    	pastTxHash = pastTxHash || '';
+    function txHash(input, output, timestamp) {
         // join addresses together in order
         var addresses = input.concat(output);
         addresses = _.pluck(addresses, 'address');
-        addresses = addresses.join('') + pastTxHash;
+        addresses = addresses.join('') + timestamp;
         // return sha256 hash in hexadecimal
         return sha256(addresses).toString('hex');
     }
 
-    console.log('new tx hash', txHash(['jack'], ['bro', 'dude'], '123'));
-
-	console.log('ran tx factory');
-	var bitcoin = Bitcoin;
-
 	fact.getCoinFromWIF = function(wif) {
-		return bitcoin.ECKey.fromWIF(wif);
+		return Bitcoin.ECKey.fromWIF(wif);
 	};
 
 	fact.transaction = function(inputHash, idx, newAmount, outputAddr) {
@@ -71,13 +71,23 @@ app.factory('TxFactory', function($http, $q) {
 				amount: oldAmount - newAmount
 			});
 
+			// attach timestamp to tx
+			newTx.timestamp = Date.now();
+
 			// hash the tx
-			newTx.hash = txHash(newTx.input, newTx.output);
+			newTx.hash = txHash(newTx.input, newTx.output, newTx.timestamp);
+
+			// sign the tx
+			var coin = Bitcoin.ECKey.fromWIF(user.privateKey);
+			console.log('user\'s coin, ', coin);
+
+			// attach the signature and public key to the tx
+			newTx.validation = {
+				signature: '',
+				publicKey: ''
+			};
   
 			console.log('new tx before being sent', newTx);
-
-			// send the tx to be broadcast to miners, it doesn't get added to db yet
-				// has to be confirmed by miners
 
 			// send tx to server with websocket to be broadcast
 			/// tx is NOT being saved yet - must be verified by miners
