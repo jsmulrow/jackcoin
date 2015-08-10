@@ -12,7 +12,8 @@ app.factory('MiningFactory', function(AuthService) {
 	var reward = 50;
 	var prevHash = '';
 	// min number of tx to start mining automatically
-	var cacheMin = Math.ceil(Math.random() * 4);
+	// var cacheMin = Math.ceil(Math.random() * 4);
+	var cacheMin = 2;
 	console.log('auto mine with this many tx: ', cacheMin);
 
 	// get user - for convenience
