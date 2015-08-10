@@ -28,6 +28,10 @@ body {
   width: 60%;
 }
 
+li {
+  overflow-x: auto;
+}
+
 @import 'directives/main';
 @import 'home/main';
 @import 'about/main';
