@@ -1,7 +1,6 @@
 app.factory('WalletFactory', function($http) {
 	var fact = {};
 
-	console.log('ran wallet factory');
 	var bitcoin = Bitcoin;
 
 	fact.getRecipients = () => {
