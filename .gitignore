@@ -1,8 +1,12 @@
 .idea
 node_modules
 npm-debug.log
-public
+public/style.css
+public/main.js
+public/mine.js
 .DS_Store
 coverage
 notes.txt
 bitcoin-favicon.png
+
+
