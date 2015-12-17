@@ -18,7 +18,7 @@ app.config(function ($stateProvider) {
 });
 
 app.controller('WalletCtrl', function($scope, user, recipients, coins, WalletFactory, TxFactory) {
-	if (user) {
+    if (user) {
         user.publicAddress = genPublicAddress(user.privateKey);
         $scope.user = user;
     }
