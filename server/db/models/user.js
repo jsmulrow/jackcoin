@@ -75,7 +75,6 @@ schema.virtual('publicKey').get(function() {
 
 // returns public address from private key
 schema.virtual('publicAddress').get(function() {
-    console.log('getting pu address');
     var coin = bitcoin.ECKey.fromWIF(this.privateKey);
     return coin.pub.getAddress().toString();
 });
