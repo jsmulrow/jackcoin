@@ -1,4 +1,4 @@
-# JackCoin
+# JackCoin: <a href="http://jackcoin.herokuapp.com">jackcoin.herokuapp.com</a>
 ## Project for Fullstack Academy Hackathon
 
 > A lightweight implementation of core bitcoin concepts using the MEAN stack, socket.io, and Web Workers
