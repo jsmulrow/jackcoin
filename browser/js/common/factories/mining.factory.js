@@ -18,7 +18,6 @@ app.factory('MiningFactory', function(AuthService) {
 	AuthService.getLoggedInUser()
 	.then(function(us) {
 		user = us;
-		console.log('mining factory has this user', user);
 	});
 
 	var initialized = false;
@@ -27,7 +26,6 @@ app.factory('MiningFactory', function(AuthService) {
 	fact.changeDifficulty = function(diff) {
 		difficulty = diff;
 		socket.emit('changeDifficulty', diff);
-        console.log('difficulty: ', diff);
 	};
 
 	fact.getDifficulty = function() {
@@ -166,7 +164,6 @@ app.factory('MiningFactory', function(AuthService) {
 		});
 
 		socket.on('newBlock', function(hash) {
-			console.log('got this new block hash', hash);
 			// update previous hash
 			prevHash = hash;
 		});
