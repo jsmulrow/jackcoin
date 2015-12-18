@@ -86,11 +86,11 @@
 
         };
 
-        this.signup = (credentials) => {
+        this.register = (credentials) => {
             return $http.post('/api/users', credentials)
                 .then(onSuccessfulLogin)
                 .catch(function() {
-                    return $q.reject({message: 'There was a problem signing up'});
+                    return $q.reject({message: 'There was a problem registering.'});
                 });
         };
 
