@@ -88,6 +88,8 @@ var seedTx = function(users) {
         return sha256(addresses).toString('hex');
     }
 
+    console.log("user 4", users[4], users[4].publicAddress);
+
     var txs = [
         {
             // seed for jack@mulrow
@@ -111,8 +113,7 @@ var seedTx = function(users) {
                 {
                     coinbase: true,
                     address: users[3].publicAddress,
-                    amount: 5000,
-                    spent: true
+                    amount: 5000
                 }
             ],
         },
@@ -124,8 +125,7 @@ var seedTx = function(users) {
                 {
                     coinbase: true,
                     address: users[4].publicAddress,
-                    amount: 650,
-                    spent: true
+                    amount: 650
                 }
             ],
         },
