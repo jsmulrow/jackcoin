@@ -48,8 +48,8 @@ var seedUsers = function () {
             password: 'satoshi'
         },
         {
-            email: 'jack.mulrow@gmail.com',
-            password: 'jack'
+            email: 'guest@user.com',
+            password: 'guest'
         }
     ];
 
@@ -117,7 +117,7 @@ var seedTx = function(users) {
             ],
         },
         {
-            // coinbase for jack.mulrow@gmail.com
+            // coinbase for guest account
             coinbase: true,
             input: [],
             output: [

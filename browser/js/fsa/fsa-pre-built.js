@@ -109,6 +109,18 @@
             });
         };
 
+        this.demo = function() {
+            var guestCredentials = {
+                email: 'guest@user.com',
+                password: 'guest'
+            };
+            return $http.post('/login', guestCredentials)
+                .then(onSuccessfulLogin)
+                .catch(function () {
+                    return $q.reject({ message: 'Error starting demo.'})
+                });
+        }
+
     });
 
     app.service('Session', function ($rootScope, AUTH_EVENTS) {
