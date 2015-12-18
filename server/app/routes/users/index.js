@@ -3,6 +3,8 @@ var router = require('express').Router();
 var _ = require('lodash');
 var mongoose = require('mongoose');
 var User = mongoose.model('User');
+var Tx = mongoose.model('Tx');
+var sha256 = require('crypto-hashing').sha256;
 
 // only send out public addresses of users
 router.get('/', function(req, res, next) {
@@ -19,11 +21,35 @@ router.get('/', function(req, res, next) {
 });
 
 router.post('/', function(req, res, next) {
+    console.log('posting a user');
+    var responseUser;
     var u = new User(req.body);
     u.save()
         .then(function(user) {
+            console.log('saved the use', user);
+            responseUser = user;
+            // give the user some JackCoin
+            var txInfo = {
+                input: [
+                    {
+                        address: 'NewUserSeed',
+                        amount: 500
+                    }
+                ],
+                output: [
+                    {
+                        address: user.publicAddress,
+                        amount: 500
+                    }
+                ]
+            };
+            txInfo.hash = txHash(txInfo.input, txInfo.output);
+            var t = new Tx(txInfo);
+            return t.save();
+        })
+        .then(function() {
             res.status(200).send({
-                user: _.omit(user.toJSON(), ['password', 'salt'])
+                user: _.omit(responseUser.toJSON(), ['password', 'salt'])
             });
         });
 });
@@ -75,3 +101,31 @@ router.delete('/:id', function(req, res, next) {
 });
 
 module.exports = router;
+
+// functions for giving new users JackCoin
+// hashes a tx
+function txHash(input, output, pastTxHash) {
+    pastTxHash = pastTxHash || '';
+    // check for coinbase
+    if (output[0].coinbase) {
+        pastTxHash = randString(10);
+    }
+    // join addresses together in order
+    var addresses = input.concat(output);
+    addresses = _.pluck(addresses, 'address');
+    addresses = addresses.join('') + pastTxHash;
+    // return sha256 hash in hexadecimal
+    return sha256(addresses).toString('hex');
+}
+
+function randString(len) {
+    var output = [];
+    for (var i = 0; i < len; i++) {
+        output.push(randDigit())
+    }
+    return output.join('');
+}
+
+function randDigit() {
+    return Math.ceil(Math.random() * 10);
+}

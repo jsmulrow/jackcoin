@@ -17,8 +17,6 @@ app.controller('SignupCtrl', function ($scope, AuthService, $state) {
 
         $scope.error = null;
 
-        console.log('signing up');
-
         AuthService.signup(signupInfo).then(function (user) {
             console.log(user);
             $state.go('chain');

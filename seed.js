@@ -163,8 +163,6 @@ var seedTx = function () {
         tx.hash = txHash(tx.input, tx.output);
     });
 
-    console.log('the txssss', txs);
-
     return Tx.remove().then(function() {
         return Tx.createAsync(txs);
     });
@@ -184,9 +182,6 @@ var seedBlocksAndChain = function () {
         // prevent one off error with the nonce
         nonce -= 1;
 
-        console.log('counter: ', counter);
-        console.log('hash: ', hash);
-        console.log('nonce: ', nonce);
         return hash;
     }
 
