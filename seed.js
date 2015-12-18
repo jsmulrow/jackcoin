@@ -32,32 +32,22 @@ var seedUsers = function () {
 
     var users = [
         {
-            // private key: KxTsiHjy21PdSGCAAgbZwrGo8RW2bcJ7gNAu5nxzEEbJFVUagTRU
-            // public addr: 1NXbFiqpVpUhWwbnwJ7m21PpwqF524VK8m
             email: 'testing@fsa.com',
             password: 'password'
         },
         {
-            // private key: 141VUn3NQFAV76oVPqDPxbxKHXyazGstob
-            // public addr: 1FWCfH41zEQMCUTmrFArtHTfeBbS16aAwQ
             email: 'obama@gmail.com',
             password: 'potus'
         },
         {
-            // private key: L4s4f6XCoVvUJ3eXo9xoZpNo4p33JmnyPAbM1qt48XhZPLQTh6sz
-            // public addr: 1FWCfH41zEQMCUTmrFArtHTfeBbS16aAwQ
             email: 'jack@mulrow.com',
             password: 'jack'
         },
         {
-            // private key: L3oQyPVUxZJQuXnzcMtTjLfWqEGFP7r3VHR2wn4Qf8EFreWfPKzk
-            // public addr: 16fFn4hdYx1Kvbqb414P2ZYHr4Tw9npLPb
             email: 'satoshi.nakamoto@bitcoin.org',
             password: 'satoshi'
         },
         {
-            // private key: L1Ntz9fEY7Y1f1t2puTviN6UoT7Zfqvbei7SAfBKK4V7D2QYKZ71
-            // public addr: 14V9Yed1Br9T5pbwGiGSryEHcvJrNCr8eJ
             email: 'jack.mulrow@gmail.com',
             password: 'jack'
         }
@@ -67,7 +57,7 @@ var seedUsers = function () {
 
 };
 
-var seedTx = function () {
+var seedTx = function(users) {
 
     var _ = require('lodash');
 
@@ -84,16 +74,16 @@ var seedTx = function () {
     }
 
     // input and output are arrays
-    function txHash(input, output, pastTxHash) {
-        pastTxHash = pastTxHash || '';
+    function txHash(tx) {
+        tx.pastTxHash = tx.pastTxHash || '';
         // check for coinbase
-        if (output[0].coinbase) {
-            pastTxHash = randString(10);
+        if (tx.coinbase) {
+            tx.pastTxHash = randString(10);
         }
         // join addresses together in order
-        var addresses = input.concat(output);
+        var addresses = tx.input.concat(tx.output);
         addresses = _.pluck(addresses, 'address');
-        addresses = addresses.join('') + pastTxHash;
+        addresses = addresses.join('') + tx.pastTxHash;
         // return sha256 hash in hexadecimal
         return sha256(addresses).toString('hex');
     }
@@ -107,60 +97,83 @@ var seedTx = function () {
             output: [
                 {
                     coinbase: true,
-                    address: '1FWCfH41zEQMCUTmrFArtHTfeBbS16aAwQ',
+                    address: users[2].publicAddress,
                     amount: 1500,
                     spent: true
                 }
             ],
-            // hash: 334a15b2a78216e766b11946924b5dd9e3d427ef56a76d9214dbd9559a6683c7
+        },
+        {
+            // coinbase for satoshi
+            coinbase: true,
+            input: [],
+            output: [
+                {
+                    coinbase: true,
+                    address: users[3].publicAddress,
+                    amount: 5000,
+                    spent: true
+                }
+            ],
+        },
+        {
+            // coinbase for jack.mulrow@gmail.com
+            coinbase: true,
+            input: [],
+            output: [
+                {
+                    coinbase: true,
+                    address: users[4].publicAddress,
+                    amount: 650,
+                    spent: true
+                }
+            ],
         },
         {
             // from jack to obama
             input: [
                 {
-                    address: '1FWCfH41zEQMCUTmrFArtHTfeBbS16aAwQ',
+                    address: users[2].publicAddress,
                     amount: 1500
                 }
             ],
             output: [
                 {
-                    address: '141VUn3NQFAV76oVPqDPxbxKHXyazGstob',
+                    address: users[1].publicAddress,
                     amount: 500
                 },
                 {
-                    address: '1FWCfH41zEQMCUTmrFArtHTfeBbS16aAwQ',
+                    address: users[2].publicAddress,
                     amount: 1000,
                     spent: true
                 }
             ]
-            // hash: 6e8cfff01bf22083495cfe499a1c616a398eec541ea103de0ecebed7a04e5259
         },
         {
+            // jack to testing@fsa
             input: [
                 {
-                    address: '1FWCfH41zEQMCUTmrFArtHTfeBbS16aAwQ',
+                    address: users[2].publicAddress,
                     amount: 1000
                 }
             ],
             output: [
                 {
-                    address: '1NXbFiqpVpUhWwbnwJ7m21PpwqF524VK8m',
-                    amount: 500
+                    address: users[0].publicAddress,
+                    amount: 400
                 },
                 {
-                    address: '1FWCfH41zEQMCUTmrFArtHTfeBbS16aAwQ',
-                    amount: 500
+                    address: users[2].publicAddress,
+                    amount: 600
                 }
             ]
-            // hash: b0cc3560ca1dc4aa03cb5dca6df52b532ce2485a1d284838a5b8d80e1878f015
         }
     ];
 
     // compute hashes for the transactions
 
-    var lastTxHash;
     txs.forEach(function(tx) {
-        tx.hash = txHash(tx.input, tx.output);
+        tx.hash = txHash(tx);
     });
 
     return Tx.remove().then(function() {
@@ -168,7 +181,7 @@ var seedTx = function () {
     });
 };
 
-var seedBlocksAndChain = function () {
+var seedBlocksAndChain = function (txs) {
 
     var nonce = 0;
     function tryHash(header) {
@@ -195,15 +208,10 @@ var seedBlocksAndChain = function () {
 
     var block = {
         // the genesis block
-        // hash:
         prevHash: 'GenesisBlock',
         timestamp: Date.now(),
         nonce: '',
-        txs: [
-            '334a15b2a78216e766b11946924b5dd9e3d427ef56a76d9214dbd9559a6683c7',
-            '6e8cfff01bf22083495cfe499a1c616a398eec541ea103de0ecebed7a04e5259',
-            'b0cc3560ca1dc4aa03cb5dca6df52b532ce2485a1d284838a5b8d80e1878f015'
-        ]
+        txs: txs.map(function(tx) {return tx.hash; })
     };
 
     // create hash for the genesis block
@@ -215,7 +223,6 @@ var seedBlocksAndChain = function () {
 
 
     // add the block to the chain
-
     var chain = {
         blocks: [block.hash]
     };
@@ -236,21 +243,16 @@ var seedBlocksAndChain = function () {
 };
 
 connectToDb.then(function () {
-    User.findAsync({}).then(function (users) {
-        if (users.length === 0) {
-            return seedUsers();
-        } else {
-            console.log(chalk.magenta('Seems to already be user data, exiting!'));
-            return;
-        }
+    User.remove().then(function() {
+        return seedUsers();
+    }).then(function(users) {
+        return seedTx(users);
+    }).then(function(txs) {
+        return seedBlocksAndChain(txs);
     }).then(function() {
-        return seedTx();
-    }).then(function() {
-        return seedBlocksAndChain();
-    }).then(function () {
         console.log(chalk.green('Seed successful!'));
         process.kill(0);
-    }).catch(function (err) {
+    }).then(null, function (err) {
         console.error(err);
         process.kill(1);
     });
