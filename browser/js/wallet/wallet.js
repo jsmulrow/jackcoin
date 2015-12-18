@@ -42,18 +42,12 @@ app.controller('WalletCtrl', function($scope, user, recipients, coins, WalletFac
     };
 
     $scope.startTransaction = function(coin, recipient, amount) {
-        console.log('transferring this much: ', amount);
-        console.log('from this coin: ', coin);
-        console.log('to this address: ', recipient);
-
         $scope.showTransaction = false;
         $scope.selectedRecipient = '';
         $scope.selectedCoin = null;
         $scope.amount = 0;
 
-
         TxFactory.transaction(coin.txHash, coin.index, amount, recipient);
-        // put correct inof in the transaciton call
     };
 
     // creates public address from private key

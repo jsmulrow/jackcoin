@@ -1,8 +1,6 @@
 app.factory('MiningFactory', function(AuthService) {
 	var fact = {};
 
-	console.log('ran the mining factory');
-
 	// dependencies 
 	var sha256 = cryptoHashing.sha256;
 
@@ -14,7 +12,6 @@ app.factory('MiningFactory', function(AuthService) {
 	// min number of tx to start mining automatically
 	// var cacheMin = Math.ceil(Math.random() * 4);
 	var cacheMin = 2;
-	console.log('auto mine with this many tx: ', cacheMin);
 
 	// get user - for convenience
 	var user;
@@ -85,16 +82,12 @@ app.factory('MiningFactory', function(AuthService) {
 			// add the timestamp
 			header += block.timestamp;
 
-			console.log('this is the header', header);
-			console.log('these are the tx', block.txs);
-
 			// start a web worker
 			var miner = new Worker('mine.js');
 			// pass the initial header in to the worker
 			miner.postMessage([header, difficulty]);
 			// have it return the valid nonce
 			miner.addEventListener('message', function(e) {
-				console.log('from miner Web Worker', e.data);
 
 				// close the miner
 				miner.terminate();
@@ -114,7 +107,6 @@ app.factory('MiningFactory', function(AuthService) {
 				block.nonce = nonce;
 
 				// send the completed block to the node (i.e. server)
-				console.log('made this block, emitting now', block);
 				socket.emit('completedBlock', block);
 				socket.emit('finishedMining');
 			});
@@ -136,13 +128,11 @@ app.factory('MiningFactory', function(AuthService) {
 		// sets up socket connection
 
 		// let node know miner is connected
-		console.log('emitting new miner event');
 		socket.emit('newMiner');
 
 		// get intial data from node
 			// e.g. unconfirmed tx, difficulty level, latest block
 		socket.on('initializeMiner', function(data) {
-			console.log('received intial data', data);
 			// validate the given tx
 			txCache = data.txCache.filter(tx => {
 				return validTx(tx);
@@ -150,31 +140,24 @@ app.factory('MiningFactory', function(AuthService) {
 			difficulty = data.difficulty;
 			prevHash = data.prevHash;
 			reward = data.reward;
-			console.log('kept this data', txCache, difficulty, prevHash);
 		});
 
 		socket.on('updatedTxCache', function(cache) {
-			console.log('updating the cache', cache);
 			txCache = cache;
 		});
 
 		socket.on('newDifficulty', function(dif) {
-			console.log('updating the difficulty');
 			difficulty = dif;
 		});
 
 		socket.on('newTx', function(tx) {
-			console.log('got this new tx: - ', tx);
 
 			// validate the tx
 			//// should be given the input, output, and amount - do the hash and see if it passes
 			//// return if it is not valid --- ie ignore the tx
-			console.log('validating the tx -- not really though');
-
 
 			// add it to the cache
 			txCache.push(tx);
-			console.log('current txCache', txCache);
 
 			if (txCache.length >= cacheMin) {
 				// start mining the block

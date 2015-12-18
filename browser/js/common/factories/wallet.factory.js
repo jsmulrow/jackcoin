@@ -23,7 +23,6 @@ app.factory('WalletFactory', function($http) {
 		tx.addInput(inputAddr, 0);
 		tx.addOutput(outputAddr, amount);
 		tx.sign(0, key);
-		console.log(tx.toHex());
 	};
 
 	return fact;

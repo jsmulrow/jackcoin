@@ -1,8 +1,6 @@
 app.factory('TxFactory', function($http, AuthService) {
 	var fact = {};
 
-	console.log('ran tx factory');
-
     var sha256 = cryptoHashing.sha256;
 
     // get user - for convenience
@@ -10,7 +8,6 @@ app.factory('TxFactory', function($http, AuthService) {
 	AuthService.getLoggedInUser()
 	.then(function(us) {
 		user = us;
-		console.log('tx factory has this user', user);
 	});
 
 	// input and output are arrays
@@ -38,16 +35,11 @@ app.factory('TxFactory', function($http, AuthService) {
 		return $http.get('/api/tx/hash/' + inputHash)
 		.then(res => res.data)
 		.then(tx => {
-			console.log('got past tx', tx);
 			// extract amount at the given index
 
 			// update vars for convenience
 			oldAddr = tx.output[idx].address;
 			oldAmount = tx.output[idx].amount;
-
-			// logs for testing
-			console.log('sender\'s address: ', oldAddr);
-			console.log('sender has this many coins: ', oldAmount);
 
 			// confirm sender has enough coins
 			if (newAmount > oldAmount) throw new Error('not enough coins');
@@ -79,7 +71,6 @@ app.factory('TxFactory', function($http, AuthService) {
 
 			// sign the tx
 			var coin = Bitcoin.ECKey.fromWIF(user.privateKey);
-			console.log('user\'s coin, ', coin);
 
 			// attach the signature and public key to the tx
 			newTx.validation = {
@@ -87,8 +78,6 @@ app.factory('TxFactory', function($http, AuthService) {
 				publicKey: ''
 			};
   
-			console.log('new tx before being sent', newTx);
-
 			// send tx to server with websocket to be broadcast
 			/// tx is NOT being saved yet - must be verified by miners
 			socket.emit('newTx', newTx);

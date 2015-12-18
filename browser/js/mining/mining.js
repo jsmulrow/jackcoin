@@ -16,14 +16,11 @@ app.controller('MiningCtrl', function($scope, user, MiningFactory) {
         user.publicAddress = genPublicAddress(user.privateKey);
         $scope.user = user;
     }
-	console.log('logged in', user);
     $scope.mining = false;
     $scope.initialized = MiningFactory.initialized;
     $scope.message = $scope.initialized ? 'Miner initialized - ready to start' : 'Initialize your miner';
     $scope.diff = MiningFactory.getDifficulty();
     $scope.resultMessage = '';
-
-    console.log('ran the mining ctrl');
 
     $scope.initializeMining = function() {
         MiningFactory.initializeMining();
@@ -45,12 +42,10 @@ app.controller('MiningCtrl', function($scope, user, MiningFactory) {
     };
 
     $scope.changeDifficulty = function(diff) {
-        console.log('changing diff to: ', diff);
         MiningFactory.changeDifficulty(diff);
     };
 
     socket.on('finishedMining', function() {
-        console.log('miner is finished');
         $scope.$apply(function() {
             $scope.mining = false;
             $scope.message = 'Mining completed';

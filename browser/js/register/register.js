@@ -18,7 +18,6 @@ app.controller('RegisterCtrl', function ($scope, AuthService, $state) {
         $scope.error = null;
 
         AuthService.register(registerInfo).then(function (user) {
-            console.log(user);
             $state.go('chain');
         }).catch(function () {
             $scope.error = 'Invalid register credentials.';
